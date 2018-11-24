@@ -18,13 +18,13 @@ class VendApi:
 
 
     def getCustomers(self):
-        return self.__getRequest__(self, self.__domain + self.__ENDPOINTS['cust'])
+        return self.__getRequest__(self.__domain + self.__ENDPOINTS['cust'])
 
     def getVoidedSales(self):
-        return self.__getRequest__(self, self.__domain + self.__ENDPOINTS['search'] + '?type=sales&status=voided')
+        return self.__getRequest__(self.__domain + self.__ENDPOINTS['search'] + '?type=sales&status=voided')
 
     def getLaybySales(self):
-        return self.__getRequest__(self, self.__domain + self.__ENDPOINTS['search'] + '?type=sales&status=layby')
+        return self.__getRequest__(self.__domain + self.__ENDPOINTS['search'] + '?type=sales&status=layby')
 
     def __getRequest__(self, url):
         response = requests.request("GET", url, headers = self.__headers)

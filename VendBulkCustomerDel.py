@@ -4,11 +4,10 @@ from Tkinter import *
 from collections import defaultdict
 from VendBulkCustomerDelGUI import *
 
-txtPrefix = None
-txtToken = None
-txtCsv = None
+gui = None
+api = None
 
-def getColumnValues(csv, colName):
+def getColumn(csv, colName):
     columns = defaultdict(list) # each value in each column is appended to a list
 
     with open('vend-customers-DELETE.csv') as f:
@@ -19,10 +18,13 @@ def getColumnValues(csv, colName):
                                      # based on column name k
     return columns[colName]
 
+def deleteCustomers():
+    api = VendApi("sungstore", "KWDZNSo67gRgSGAU3G2vT_IMDDT611m9s40eVisq")
+    print(api.getCustomers())
 
 if __name__ == "__main__":
 
-    gui = VendBulkCustomerDelGUI()
+    gui = VendBulkCustomerDelGUI(deleteCustomers)
     #root = Tk()
     #__initWidgets(root)
 

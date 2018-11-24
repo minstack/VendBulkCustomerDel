@@ -2,7 +2,7 @@ from Tkinter import *
 
 class VendBulkCustomerDelGUI:
 
-    def __init__(self):
+    def __init__(self, deletefunc):
         self.root = Tk()
         self.root.title("Vend Bulk Customer Delete")
         mainFrame = Frame(self.root,width=600, height=400)
@@ -34,10 +34,12 @@ class VendBulkCustomerDelGUI:
 
         csvframe.grid(row=3,column=1, sticky=W)
 
-        self.btnDelCust = Button(mainFrame, text="Delete Customers")
+        self.btnDelCust = Button(mainFrame, text="Delete Customers", command=deletefunc)
+        self.btnDelCust.grid(row=4, columnspan=2)
 
         checklistFrame = Frame(mainFrame, width=200, height=200)
         checklistFrame.grid(row=1, column=2, rowspan=4)
+
 
     def main(self):
         self.root.mainloop()
