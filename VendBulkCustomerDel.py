@@ -1,11 +1,14 @@
-import VendApi as api
-import Tkinter as tk
 import csv
+from VendApi import *
+from Tkinter import *
 from collections import defaultdict
+from VendBulkCustomerDelGUI import *
 
-# will move this code to separate function if I need to pull any other columns
-# most likely not
-def getCustomerCodes(csv):
+txtPrefix = None
+txtToken = None
+txtCsv = None
+
+def getColumnValues(csv, colName):
     columns = defaultdict(list) # each value in each column is appended to a list
 
     with open('vend-customers-DELETE.csv') as f:
@@ -14,14 +17,15 @@ def getCustomerCodes(csv):
             for (k,v) in row.items(): # go over each column name and value
                 columns[k].append(v) # append the value into the appropriate list
                                      # based on column name k
-    return columns['customer_code']
+    return columns[colName]
 
 
-root = tk.Tk()
+if __name__ == "__main__":
 
+    gui = VendBulkCustomerDelGUI()
+    #root = Tk()
+    #__initWidgets(root)
 
+    gui.main()
 
-
-
-
-root.mainloop()
+    #root.mainloop()
