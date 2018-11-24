@@ -16,6 +16,8 @@ class VendApi:
         self.__domain = self.__BASE_URL.format(prefix)
         self.__headers["Authorization"] = "Bearer " + token
 
+    def deleteCustomer(self, id):
+        return requests.request("DELETE", "{0}{1}{2}".format(self.__domain, self.__ENDPOINTS['cust'], id), headers=self.__headers)
 
     def getCustomers(self):
         return self.__getRequest__(self.__domain + self.__ENDPOINTS['cust'])
