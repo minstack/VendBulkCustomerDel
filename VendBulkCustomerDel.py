@@ -1,6 +1,5 @@
 import csv
 from VendApi import *
-from Tkinter import *
 from collections import defaultdict
 from VendBulkCustomerDelGUI import *
 
@@ -19,8 +18,34 @@ def getColumn(csv, colName):
     return columns[colName]
 
 def deleteCustomers():
-    api = VendApi("sungstore", "KWDZNSo67gRgSGAU3G2vT_IMDDT611m9s40eVisq")
-    print(api.getCustomers())
+    if (not gui.entriesHaveValues()):
+        ## error
+        print("in error text")
+        gui.setStatus("Please check values for prefix, token and CSV...")
+        return
+    else:
+        api = VendApi(gui.txtPrefix.get(), gui.txtToken.get())
+
+        processCustomers(api)
+
+        print(api.getCustomers())
+
+def processCustomers(api):
+    gui.setStatus("Retreiving customers...")
+    customers = api.getCustomers()
+    gui.setStatus("Retreived {0} customers...".format(len(customers)))
+
+    gui.setStatus("Matching IDs to provided customer code...")
+    codeToId = getCustCodeToId(customers)
+
+
+def getCustCodeToId(customers):
+    codeToId = {}
+
+    for cust in customers:
+        codeToId[cust['customer_code']] = customers['id']
+
+    return codeToId
 
 if __name__ == "__main__":
 
