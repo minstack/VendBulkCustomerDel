@@ -18,7 +18,7 @@ def getColumn(csvFile, colName):
                                      # based on column name k
     return columns[colName]
 
-def deleteCustomers():
+def startProcess():
     if not gui.entriesHaveValues():
         ## error
         gui.setStatus("Please check values for prefix, token and CSV...")
@@ -53,11 +53,15 @@ def processCustomers(api):
     gui.setStatus("Matching IDs to provided customer code...")
     codeToId = getCustCodeToId(customers)
 
-
     custCodeToDelete = getColumn(gui.csvFilePath, 'customer_code')
+    numCustToDelete = len(custCodeToDelete)
+    if  numCustToDelete == 0:
+        gui.setStatus("Please make sure the provided CSV has customer_code column...")
+        return
 
+    gui.setStatus("Found {0} to delete...".format(numCustToDelete))
 
-
+    deleteCustomers(custCodeToDelete, codeToId, numCustToDelete)
 
 def getCustCodeToId(customers):
     codeToId = {}
@@ -69,10 +73,6 @@ def getCustCodeToId(customers):
 
 if __name__ == "__main__":
 
-    gui = VendBulkCustomerDelGUI(deleteCustomers)
-    #root = Tk()
-    #__initWidgets(root)
+    gui = VendBulkCustomerDelGUI(startProcess)
 
     gui.main()
-
-    #root.mainloop()
