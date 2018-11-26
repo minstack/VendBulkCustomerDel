@@ -61,7 +61,35 @@ def processCustomers(api):
 
     gui.setStatus("Found {0} to delete...".format(numCustToDelete))
 
-    deleteCustomers(custCodeToDelete, codeToId, numCustToDelete)
+    result = deleteCustomers(custCodeToDelete, codeToId, numCustToDelete)
+
+
+
+def deleteCustomers(custCodeToDelete, codeToId, totalCust):
+    resultDict = {
+        200: [],
+        500: []
+    }
+
+    i = 1
+    for code in custCodeToDelete:
+
+        response = api.deleteCustomer(codeToId[code])
+        resultDict[response].append(code)
+        gui.setStatus("Deleting customer {0} out of {1}".format(i, totalCust))
+
+        i = len(resultDict[200]) #only counts successful deletes
+
+    gui.setStatus("Successfully delete {0} customers...".format(i))
+    
+    return resultDict
+
+def succesfulDelete(custCode, currentIndex):
+
+
+    currentIndex += 1
+
+    return currentIndex
 
 def getCustCodeToId(customers):
     codeToId = {}
