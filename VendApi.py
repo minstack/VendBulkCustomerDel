@@ -36,7 +36,7 @@ class VendApi:
         if response.status_code != 200:
             return None
 
-        # gotta check if the url already has params
+        # gotta check if the url already has params for search
         # no ternary in python?
         if "?" in url:
             cursorParam = "&after={0}"
@@ -50,7 +50,7 @@ class VendApi:
         while version is not None:
             tempDataList.extend(tempJson['data'])
 
-            if tempJson['version']['max']:
+            if tempJson['version']['max'] is None:
                 break;
 
             version = tempJson['version']['max']
