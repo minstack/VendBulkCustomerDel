@@ -81,15 +81,8 @@ def deleteCustomers(custCodeToDelete, codeToId, totalCust):
         i = len(resultDict[200]) #only counts successful deletes
 
     gui.setStatus("Successfully delete {0} customers...".format(i))
-    
+
     return resultDict
-
-def succesfulDelete(custCode, currentIndex):
-
-
-    currentIndex += 1
-
-    return currentIndex
 
 def getCustCodeToId(customers):
     codeToId = {}
