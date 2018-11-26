@@ -59,11 +59,9 @@ def processCustomers(api):
         gui.setStatus("Please make sure the provided CSV has customer_code column...")
         return
 
-    gui.setStatus("Found {0} to delete...".format(numCustToDelete))
+    gui.setStatus("Found {0} customers to delete...".format(numCustToDelete))
 
     result = deleteCustomers(custCodeToDelete, codeToId, numCustToDelete)
-
-
 
 def deleteCustomers(custCodeToDelete, codeToId, totalCust):
     resultDict = {
