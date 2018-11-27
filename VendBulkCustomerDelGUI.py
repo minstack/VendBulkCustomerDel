@@ -66,6 +66,9 @@ class VendBulkCustomerDelGUI:
         self.txtToken.delete(0,END)
         self.txtPrefix.delete(0,END)
         self.txtCsv.delete(0,END)
+        self.paConfirmation.set(0)
+        self.tokenExpiry.set(0)
+
 
     def entriesHaveValues(self):
         return (len(self.txtPrefix.get().strip()) > 0) and (len(self.txtToken.get().strip()) > 0) and (len(self.txtCsv.get().strip()) > 0)

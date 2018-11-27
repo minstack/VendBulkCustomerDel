@@ -10,11 +10,12 @@ class VendApi:
     }
 
     __domain = ''
-    __headers = {"Authorization" : "", "User-Agent" : "Python 2.7 Vend Support Tool"}
+    __headers = {"Authorization" : "", "User-Agent" : "Python 2.7/Vend-Support-Tool"}
 
     def __init__(self, prefix, token):
         self.__domain = self.__BASE_URL.format(prefix)
         self.__headers["Authorization"] = "Bearer " + token
+        self.prefix = prefix
 
     def deleteCustomer(self, id):
         return requests.request("DELETE", "{0}{1}{2}".format(self.__domain, self.__ENDPOINTS['cust'], id), headers=self.__headers).status_code
@@ -33,7 +34,7 @@ class VendApi:
         tempOpenSales.extend(self.getOnAccountSales())
         tempOpenSales.extend(self.getLaybySales())
 
-        return tempOpenSales 
+        return tempOpenSales
 
     def __getRequest__(self, url):
 

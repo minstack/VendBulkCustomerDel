@@ -3,6 +3,7 @@ from VendApi import *
 from collections import defaultdict
 from VendBulkCustomerDelGUI import *
 import re
+import datetime as dt
 
 gui = None
 api = None
@@ -98,18 +99,32 @@ def getOpenSaleMatch(custList, codeToId, salesList):
 
          salesInvoice.append(sale['id'])
 
-     return saleInvoices
+    return saleInvoices
 
 
 def writeCustomersToCSV(custList):
-    writeListToCSV(custList, "customer_code")
+    writeListToCSV(custList, "customer_code", "failed_customers")
 
 def writeOpenSalesToCsv(salesList):
-    writeListToCSV(salesList, "invoice_number")
+    writeListToCSV(salesList, "invoice_number", "open_sales_to_delete")
 
-def writeListToCSV(list, colHeader):
+def writeListToCSV(list, colHeader, title):
     #generic list to csv function
+    if colHeader:
+        list.insert(0, colHeader)
 
+    filename = api.prefix + dt.datetime.today() + title + ".csv"
+
+    gui.setStatus("Writing {0}...".format(filename))
+
+    with open("./" + filename, "w") as file:
+        writer = csv.writer(file)
+        for row in list:
+            writer.writerow(row)
+
+    gui.setStatus("{0} completed...")
+
+    #return
 
 def deleteCustomers(custCodeToDelete, codeToId, totalCust):
     resultDict = {
