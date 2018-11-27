@@ -63,6 +63,54 @@ def processCustomers(api):
 
     result = deleteCustomers(custCodeToDelete, codeToId, numCustToDelete)
 
+    if len(result[500]) > 0:
+        processFailedCustomers(resultDict[500], codeToId)
+
+    #setResultMessage()
+
+def processFailedCustomers(failedCustomers, codeToId):
+
+    writeCustomersToCSV(failedCustomers)
+
+    gui.setStatus("Retreiving open sales...")
+    openSales = api.getOpenSales()
+
+    # filter opensales based on customers to delete
+    matchedOpenSales = getOpenSaleMatch(failedCustomers, codeToId, openSales)
+
+    writeOpenSalesToCsv(matchedOpenSales)
+
+def getOpenSaleMatch(custList, codeToId, salesList):
+
+    tempReverse = {}
+    # id to code to linearly check if sale is attached to customer
+    # trying to be deleted
+    for code in custList:
+        id = codeToId[code]
+        tempReverse[id] = code
+
+    saleInvoices = []
+    for sale in salesList:
+         custCode = tempReverse.get(sale['customer_id'], None)
+
+         if custCode is None:
+             continue
+
+         salesInvoice.append(sale['id'])
+
+     return saleInvoices
+
+
+def writeCustomersToCSV(custList):
+    writeListToCSV(custList, "customer_code")
+
+def writeOpenSalesToCsv(salesList):
+    writeListToCSV(salesList, "invoice_number")
+
+def writeListToCSV(list, colHeader):
+    #generic list to csv function
+
+
 def deleteCustomers(custCodeToDelete, codeToId, totalCust):
     resultDict = {
         200: [],
@@ -76,9 +124,9 @@ def deleteCustomers(custCodeToDelete, codeToId, totalCust):
         resultDict[response].append(code)
         gui.setStatus("Deleting customer {0} out of {1}".format(i, totalCust))
 
-        i = len(resultDict[200]) #only counts successful deletes
+        i = len(resultDict[200]) #only count successful deletes
 
-    gui.setStatus("Successfully delete {0} customers...".format(i))
+    gui.setStatus("Successfully deleted {0} customers...".format(i))
 
     return resultDict
 

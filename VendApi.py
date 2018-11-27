@@ -22,14 +22,20 @@ class VendApi:
     def getCustomers(self):
         return self.__getRequest__(self.__domain + self.__ENDPOINTS['cust'])
 
-    def getVoidedSales(self):
-        return self.__getRequest__(self.__domain + self.__ENDPOINTS['search'] + '?type=sales&status=voided')
+    def getOnAccountSales(self):
+        return self.__getRequest__(self.__domain + self.__ENDPOINTS['search'] + '?type=sales&status=onaccount')
 
     def getLaybySales(self):
         return self.__getRequest__(self.__domain + self.__ENDPOINTS['search'] + '?type=sales&status=layby')
 
-    def __getRequest__(self, url):
+    def getOpenSales(self):
+        tempOpenSales = []
+        tempOpenSales.extend(self.getOnAccountSales())
+        tempOpenSales.extend(self.getLaybySales())
 
+        return tempOpenSales 
+
+    def __getRequest__(self, url):
 
         response = requests.request("GET", url, headers = self.__headers)
 
