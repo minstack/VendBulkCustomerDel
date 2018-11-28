@@ -11,23 +11,32 @@ class VendApi:
 
     __domain = ''
     __headers = {"Authorization" : "", "User-Agent" : "Python 2.7/Vend-Support-Tool"}
+    __prefix = ''
 
     def __init__(self, prefix, token):
         self.__domain = self.__BASE_URL.format(prefix)
         self.__headers["Authorization"] = "Bearer " + token
-        self.prefix = prefix
+        self.__prefix = prefix
 
     def deleteCustomer(self, id):
-        return requests.request("DELETE", "{0}{1}{2}".format(self.__domain, self.__ENDPOINTS['cust'], id), headers=self.__headers).status_code
+        return requests.request("DELETE", '{0}{1}/{2}'.format(self.__domain, self.__ENDPOINTS['cust'], id), headers=self.__headers).status_code
 
     def getCustomers(self):
         return self.__getRequest__(self.__domain + self.__ENDPOINTS['cust'])
 
     def getOnAccountSales(self):
-        return self.__getRequest__(self.__domain + self.__ENDPOINTS['search'] + '?type=sales&status=onaccount')
+        return self.__getSearch__(self.__domain + self.__ENDPOINTS['search'] + '?type=sales&status=onaccount')
 
     def getLaybySales(self):
-        return self.__getRequest__(self.__domain + self.__ENDPOINTS['search'] + '?type=sales&status=layby')
+        return self.__getSearch__(self.__domain + self.__ENDPOINTS['search'] + '?type=sales&status=layby')
+
+    def __getSearch__(self, url):
+        response = requests.request("GET", url, headers = self.__headers)
+
+        if response.status_code != 200:
+            return None
+
+        return requests.request("GET", url, headers = self.__headers).json()['data']
 
     def getOpenSales(self):
         tempOpenSales = []
@@ -35,6 +44,9 @@ class VendApi:
         tempOpenSales.extend(self.getLaybySales())
 
         return tempOpenSales
+
+    def getPrefix(self):
+        return self.__prefix
 
     def __getRequest__(self, url):
 
@@ -64,5 +76,5 @@ class VendApi:
 
             tempJson = requests.request("GET", url + cursorParam.format(version), headers = self.__headers).json()
 
-
+        print(len(tempDataList))
         return tempDataList

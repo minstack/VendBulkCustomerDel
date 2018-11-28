@@ -62,6 +62,13 @@ class VendBulkCustomerDelGUI:
         chkTokenExpiry = Checkbutton(checklistFrame, text="Token Expiry Set", variable=self.tokenExpiry)
         chkTokenExpiry.grid(row=2, sticky=W)
 
+        resultFrame = Frame(mainFrame)
+        resultFrame.grid(row=5,column=0, columnspan=3, rowspan=4)
+
+        self.resultText = StringVar()
+        resultLabel = Message(resultFrame, textvariable=self.resultText,font="Helvetica 16 bold", width=200)
+        resultLabel.pack(pady=10)
+
     def reset(self):
         self.txtToken.delete(0,END)
         self.txtPrefix.delete(0,END)
@@ -87,10 +94,13 @@ class VendBulkCustomerDelGUI:
         filename = askopenfilename(parent=self.root)
         self.txtCsv.insert(0, filename)
         self.csvFilePath = filename
-        print(filename)
+        #print(filename)
 
     def setStatus(self, msg):
         self.statusMsg.set(msg)
+
+    def setResult(self, msg):
+        self.resultText.set(msg)
 
     def main(self):
         self.root.mainloop()

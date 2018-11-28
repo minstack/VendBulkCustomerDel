@@ -35,6 +35,7 @@ def startProcess():
         return
 
 
+    global api
     api = VendApi(gui.txtPrefix.get(), gui.txtToken.get())
 
     processCustomers(api)
@@ -45,7 +46,7 @@ def processCustomers(api):
     gui.setStatus("Retreiving customers...")
     customers = api.getCustomers()
 
-    if customers is None:
+    if customers is None or len(customers) == 0:
         gui.setStatus("Please double check that prefix/token are correct...")
         return
 
@@ -55,6 +56,7 @@ def processCustomers(api):
     codeToId = getCustCodeToId(customers)
 
     custCodeToDelete = getColumn(gui.csvFilePath, 'customer_code')
+
     numCustToDelete = len(custCodeToDelete)
     if  numCustToDelete == 0:
         gui.setStatus("Please make sure the provided CSV has customer_code column...")
@@ -62,24 +64,50 @@ def processCustomers(api):
 
     gui.setStatus("Found {0} customers to delete...".format(numCustToDelete))
 
-    result = deleteCustomers(custCodeToDelete, codeToId, numCustToDelete)
+    result = deleteCustomers(custCodeToDelete, codeToId, numCustToDelete, api)
+    resultCsv = None
 
     if len(result[500]) > 0:
-        processFailedCustomers(resultDict[500], codeToId)
+        resultCsv = processFailedCustomers(result[500], codeToId)
 
-    #setResultMessage()
+
+    setResultMessage(result, resultCsv)
+
+def setResultMessage(result, resultCsv):
+    failedCsv = None
+    openSalesCsv = None
+
+    if resultCsv:
+        failedCsv = resultCsv.get('failedcust', None)
+        openSalesCsv = resultCsv.get('opensales', None)
+
+    successfulDeletes = len(result[204])
+
+    msg = "{0} customers were successfully deleted.\n".format(successfulDeletes)
+
+    if failedCsv:
+        msg += "{0} could not be deleted. Exported list to {1}\n".format(len(result[500]), failedCsv)
+
+    if openSalesCsv:
+        msg += "Exported open sales linked to customers to {0}".format(openSalesCsv)
+
+    gui.setResult(msg)
 
 def processFailedCustomers(failedCustomers, codeToId):
+    filenames = {}
 
-    writeCustomersToCSV(failedCustomers)
+    filenames['failedcust'] = writeCustomersToCSV(failedCustomers)
 
     gui.setStatus("Retreiving open sales...")
     openSales = api.getOpenSales()
 
+    #print(openSales)
+    #print('after get open sales')
     # filter opensales based on customers to delete
+    failedCustomers.remove('customer_code')
     matchedOpenSales = getOpenSaleMatch(failedCustomers, codeToId, openSales)
 
-    writeOpenSalesToCsv(matchedOpenSales)
+    filenames['opensales'] = writeOpenSalesToCsv(matchedOpenSales)
 
 def getOpenSaleMatch(custList, codeToId, salesList):
 
@@ -97,59 +125,67 @@ def getOpenSaleMatch(custList, codeToId, salesList):
          if custCode is None:
              continue
 
-         salesInvoice.append(sale['id'])
+         saleInvoices.append(sale['invoice_number'])
 
     return saleInvoices
 
 
 def writeCustomersToCSV(custList):
-    writeListToCSV(custList, "customer_code", "failed_customers")
+    return writeListToCSV(custList, "customer_code", "failed_customers")
 
 def writeOpenSalesToCsv(salesList):
-    writeListToCSV(salesList, "invoice_number", "open_sales_to_delete")
+    return writeListToCSV(salesList, "invoice_number", "open_sales_to_delete")
 
 def writeListToCSV(list, colHeader, title):
     #generic list to csv function
     if colHeader:
         list.insert(0, colHeader)
 
-    filename = api.prefix + dt.datetime.today() + title + ".csv"
+    filename = api.getPrefix() + dt.datetime.now().strftime("%Y-%m-%dT%H:%M") + title + ".csv"
 
     gui.setStatus("Writing {0}...".format(filename))
 
-    with open("./" + filename, "w") as file:
-        writer = csv.writer(file)
+    with open("./" + filename, "wb") as file:
+        writer = csv.writer(file, quoting=csv.QUOTE_ALL)
         for row in list:
-            writer.writerow(row)
+            writer.writerow([row])
 
-    gui.setStatus("{0} completed...")
+    gui.setStatus("Write {0} completed...".format(filename))
 
-    #return
+    return filename
 
-def deleteCustomers(custCodeToDelete, codeToId, totalCust):
+def deleteCustomers(custCodeToDelete, codeToId, totalCust, api):
     resultDict = {
-        200: [],
-        500: []
+        500: [],
+        404: [],
+        204: []
     }
 
-    i = 1
+    i = 0
+    print(codeToId)
     for code in custCodeToDelete:
+        codeToDel = codeToId.get(str(code), None)
+        if codeToDel is None:
+            continue
 
-        response = api.deleteCustomer(codeToId[code])
+        response = api.deleteCustomer(codeToDel)
+        #print(response)
         resultDict[response].append(code)
         gui.setStatus("Deleting customer {0} out of {1}".format(i, totalCust))
 
-        i = len(resultDict[200]) #only count successful deletes
+        i = len(resultDict[204]) #only count successful deletes
 
     gui.setStatus("Successfully deleted {0} customers...".format(i))
 
+    print(resultDict)
     return resultDict
 
 def getCustCodeToId(customers):
     codeToId = {}
 
     for cust in customers:
-        codeToId[cust['customer_code']] = cust['id']
+        #print(cust['customer_code'])
+        codeToId[str(cust['customer_code']).lstrip("0")] = cust['id']
 
     return codeToId
 
