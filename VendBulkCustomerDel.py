@@ -92,6 +92,9 @@ def setResultMessage(result, resultCsv):
         msg += "Exported open sales linked to customers to {0}".format(openSalesCsv)
 
     gui.setResult(msg)
+    print(msg)
+
+    #reset gui, status etc.
 
 def processFailedCustomers(failedCustomers, codeToId):
     filenames = {}
@@ -162,7 +165,7 @@ def deleteCustomers(custCodeToDelete, codeToId, totalCust, api):
     }
 
     i = 0
-    print(codeToId)
+    #print(codeToId)
     for code in custCodeToDelete:
         codeToDel = codeToId.get(str(code), None)
         if codeToDel is None:
@@ -177,7 +180,7 @@ def deleteCustomers(custCodeToDelete, codeToId, totalCust, api):
 
     gui.setStatus("Successfully deleted {0} customers...".format(i))
 
-    print(resultDict)
+    #print(resultDict)
     return resultDict
 
 def getCustCodeToId(customers):

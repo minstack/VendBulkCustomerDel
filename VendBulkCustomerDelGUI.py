@@ -66,7 +66,7 @@ class VendBulkCustomerDelGUI:
         resultFrame.grid(row=5,column=0, columnspan=3, rowspan=4)
 
         self.resultText = StringVar()
-        resultLabel = Message(resultFrame, textvariable=self.resultText,font="Helvetica 16 bold", width=200)
+        resultLabel = Message(resultFrame, textvariable=self.resultText,font="Helvetica 14 bold", width=250)
         resultLabel.pack(pady=10)
 
     def reset(self):

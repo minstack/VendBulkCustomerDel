@@ -75,6 +75,5 @@ class VendApi:
             version = tempJson['version']['max']
 
             tempJson = requests.request("GET", url + cursorParam.format(version), headers = self.__headers).json()
-
-        print(len(tempDataList))
+            
         return tempDataList
