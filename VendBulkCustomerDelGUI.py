@@ -7,7 +7,7 @@ class VendBulkCustomerDelGUI:
     def __init__(self, deletefunc):
         self.__deletefunc = deletefunc
         self.root = Tk()
-        self.root.geometry("500x350")
+        self.root.geometry("700x450")
         self.root.resizable(0,0)
         self.root.title("Vend Bulk Customer Delete")
         self.root.pack_propagate(0)
@@ -51,9 +51,13 @@ class VendBulkCustomerDelGUI:
         self.btnReset.pack()
         btnframe.grid(row=4, column=1)
 
+        self.csvList = []
+        csvListbox = Listbox(mainFrame, listvariable=self.csvList, width=20)
+        csvListbox.grid(row=1, column=2, rowspan=3)
+
         checklistFrame = Frame(mainFrame, width=200, height=200, bd=1)
         Label(checklistFrame, text="Checklist", font="Helvetica 15 bold").grid(row=0)
-        checklistFrame.grid(row=0, column=2, rowspan=3)
+        checklistFrame.grid(row=0, column=3, rowspan=3)
 
         self.paConfirmation = BooleanVar()
         self.tokenExpiry = BooleanVar()
@@ -101,6 +105,16 @@ class VendBulkCustomerDelGUI:
 
     def setResult(self, msg):
         self.resultText.set(msg)
+
+    def setDeletingState(self):
+        self.btnReset.configure(state='disabled')
+        self.btnDelCust.configure(state='disabled')
+        self.btnOpenCsvDialog.configure(state='disabled')
+
+    def setReadyState(self):
+        self.btnReset.configure(state='normal')
+        self.btnDelCust.configure(state='normal')
+        self.btnOpenCsvDialog.configure(state='normal')
 
     def main(self):
         self.root.mainloop()

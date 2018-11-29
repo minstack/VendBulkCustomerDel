@@ -112,6 +112,8 @@ def processFailedCustomers(failedCustomers, codeToId):
 
     filenames['opensales'] = writeOpenSalesToCsv(matchedOpenSales)
 
+    return filenames
+
 def getOpenSaleMatch(custList, codeToId, salesList):
 
     tempReverse = {}
