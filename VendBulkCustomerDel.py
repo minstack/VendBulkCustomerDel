@@ -4,6 +4,7 @@ from collections import defaultdict
 from VendBulkCustomerDelGUI import *
 import re
 import datetime as dt
+from os.path import expanduser
 
 gui = None
 api = None
@@ -95,10 +96,10 @@ def setResultMessage(result, resultCsv):
     msg = "{0} customers were successfully deleted.\n".format(successfulDeletes)
 
     if failedCsv:
-        msg += "{0} could not be deleted. \nExported list to {1}\n".format(len(result[500]), failedCsv)
+        msg += "{0} could not be deleted. \nSaved {1} to desktop.\n".format(len(result[500]), failedCsv)
 
     if openSalesCsv:
-        msg += "Exported open sales linked to customers to {0}".format(openSalesCsv)
+        msg += "Saved {0} to desktop".format(openSalesCsv)
 
     gui.setResult(msg)
     gui.btnReset.config(state=NORMAL)
@@ -160,7 +161,9 @@ def writeListToCSV(list, colHeader, title):
 
     gui.setStatus("Writing {0}...".format(filename))
 
-    with open("./" + filename, "wb") as file:
+    desktop = expanduser("~") + '/' + 'Desktop/'
+
+    with open(desktop + filename, "wb") as file:
         writer = csv.writer(file, quoting=csv.QUOTE_ALL)
         for row in list:
             writer.writerow([row])
