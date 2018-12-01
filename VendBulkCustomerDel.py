@@ -90,18 +90,9 @@ def processCustomers(api):
         tempThread = threading.Thread(target=deleteCustomers, args=(subarr,codeToId,numCustToDelete, api,outQueue,))
         tempThread.start()
         threads.append(tempThread)
-    #subThread1 = threading.Thread(target=deleteCustomers, args=(subArr1,codeToId,numCustToDelete, api,outQueue,))
-    #subThread2 = threading.Thread(target=deleteCustomers, args=(subArr2,codeToId,numCustToDelete, api,outQueue,))
-    #subThread3 = threading.Thread(target=deleteCustomers, args=(subArr3,codeToId,numCustToDelete, api,outQueue,))
-    #subThread1.start()
-    #subThread2.start()
-    #subThread3.start()
 
     for thread in threads:
         thread.join()
-    #subThread1.join()
-    #subThread2.join()
-    #subThread3.join()
 
     results = []
     result ={
@@ -119,15 +110,6 @@ def processCustomers(api):
         result[status_codes[0]].extend(r[status_codes[0]])
         result[status_codes[1]].extend(r[status_codes[1]])
         result[status_codes[2]].extend(r[status_codes[2]])
-
-    #result = outQueue.get()
-    #temp = outQueue.get()
-    #temp2 = outQueue.get()
-    #for status in tempArr:
-    #    result[status].extend(temp[status])
-    #    result[status].extend(temp2[status])
-
-    #result = deleteCustomers(custCodeToDelete, codeToId, numCustToDelete, api)
 
     gui.setStatus("Successfully deleted {0} customers...".format(len(result[204])))
 
