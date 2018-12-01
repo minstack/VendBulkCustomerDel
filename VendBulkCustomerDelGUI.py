@@ -7,7 +7,7 @@ class VendBulkCustomerDelGUI:
     def __init__(self, deletefunc):
         self.__deletefunc = deletefunc
         self.root = Tk()
-        self.root.geometry("700x450")
+        self.root.geometry("650x450")
         self.root.resizable(0,0)
         self.root.title("Vend Bulk Customer Delete")
         self.root.pack_propagate(0)
@@ -58,13 +58,17 @@ class VendBulkCustomerDelGUI:
     def __loadCsvControl__(self, mainFrame):
         self.csvList = []
         self.csvFileDict = {}
-        self.csvListbox = Listbox(mainFrame, listvariable=self.csvList, width=18, bd=0.5)
-        csvHeader = Label(mainFrame, text="CSV Files", font="Helvetica 14 bold")
+        self.csvListbox = Listbox(mainFrame, listvariable=self.csvList, width=25, bd=0.5)
 
-        csvHeader.grid(row=0, column=2)
+
+        #csvHeader.grid(row=0, column=2)
         self.csvListbox.grid(row=1, column=2, rowspan=3)
 
         csvFrame = Frame(mainFrame)
+
+        csvHeader = Label(csvFrame, text="CSV Files", font="Helvetica 14 bold")
+        csvHeader.pack(side=LEFT)
+
         csvFrame.grid(row=4, column=2, sticky=E)
         self.btnOpenCsvDialog = Button(csvFrame, text="+", font="Helvetica 14 bold", command=self.openFile)
         self.btnOpenCsvDialog.pack(side=LEFT)
@@ -73,15 +77,15 @@ class VendBulkCustomerDelGUI:
 
     def __loadCheckListControl__(self, mainFrame):
         checklistFrame = Frame(mainFrame, width=200, height=200, bd=1)
-        Label(mainFrame, text="Checklist", font="Helvetica 14 bold").grid(row=0, column=3)
-        checklistFrame.grid(row=0, column=3, rowspan=3)
+        #Label(mainFrame, text="Checklist", font="Helvetica 14 bold").grid(row=0, column=3)
+        checklistFrame.grid(row=3, column=1)
 
         self.paConfirmation = BooleanVar()
         self.tokenExpiry = BooleanVar()
-        chkPaConfirm = Checkbutton(checklistFrame, text="PA Confirmation", variable=self.paConfirmation)
-        chkPaConfirm.grid(row=1, sticky=W)
-        chkTokenExpiry = Checkbutton(checklistFrame, text="Token Expiry Set", variable=self.tokenExpiry)
-        chkTokenExpiry.grid(row=2, sticky=W)
+        self.chkPaConfirm = Checkbutton(checklistFrame, text="PA Confirmation", variable=self.paConfirmation)
+        self.chkPaConfirm.grid(row=1, sticky=W)
+        self.chkTokenExpiry = Checkbutton(checklistFrame, text="Token Expiry Set", variable=self.tokenExpiry)
+        self.chkTokenExpiry.grid(row=2, sticky=W)
 
     def __loadMessageControls__(self, mainFrame):
         self.statusMsg = StringVar()
@@ -92,25 +96,32 @@ class VendBulkCustomerDelGUI:
         resultFrame.grid(row=5,column=0, columnspan=3, rowspan=4)
 
         self.resultText = StringVar()
-        resultLabel = Message(resultFrame, textvariable=self.resultText,font="Helvetica 14 bold", width=250)
-        resultLabel.pack(pady=10)
+        resultLabel = Message(resultFrame, textvariable=self.resultText,font="Helvetica 14", width=500)
+        resultLabel.pack(pady=15)
 
     def reset(self):
+        self.setStatus("")
+        self.setReadyState()
         self.txtToken.delete(0,END)
         self.txtPrefix.delete(0,END)
-        self.txtCsv.delete(0,END)
         self.paConfirmation.set(0)
         self.tokenExpiry.set(0)
+        del self.csvList[:]
+        self.csvListbox.delete(0,END)
+        self.csvFileDict = {}
+        self.setResult("")
 
 
     def entriesHaveValues(self):
-        return (len(self.txtPrefix.get().strip()) > 0) and (len(self.txtToken.get().strip()) > 0) and (len(self.txtCsv.get().strip()) > 0)
+        return (len(self.txtPrefix.get().strip()) > 0) and (len(self.txtToken.get().strip()) > 0) and (len(self.csvList) > 0)
 
     def startThread(self):
         self.setStatus("")
+        self.setDeletingState()
         thr = threading.Thread(target=self.__deletefunc, args=(), kwargs={})
 
         thr.start()
+        #self.setReadyState()
 
     def isChecklistReady(self):
         return self.tokenExpiry.get() and self.paConfirmation.get()
@@ -139,14 +150,26 @@ class VendBulkCustomerDelGUI:
         self.resultText.set(msg)
 
     def setDeletingState(self):
-        self.btnReset.configure(state='disabled')
-        self.btnDelCust.configure(state='disabled')
-        self.btnOpenCsvDialog.configure(state='disabled')
+        self.btnReset.config(state=DISABLED)
+        self.btnDelCust.config(state=DISABLED)
+        self.btnOpenCsvDialog.config(state=DISABLED)
+        self.btnDeleteFile.config(state=DISABLED)
+        self.txtToken.config(state=DISABLED)
+        self.txtPrefix.config(state=DISABLED)
+        self.chkPaConfirm.config(state=DISABLED)
+        self.chkTokenExpiry.config(state=DISABLED)
+        self.root.update()
 
     def setReadyState(self):
-        self.btnReset.configure(state='normal')
-        self.btnDelCust.configure(state='normal')
-        self.btnOpenCsvDialog.configure(state='normal')
+        self.btnReset.config(state=NORMAL)
+        self.btnDelCust.config(state=NORMAL)
+        self.btnOpenCsvDialog.config(state=NORMAL)
+        self.btnDeleteFile.config(state=NORMAL)
+        self.txtToken.config(state=NORMAL)
+        self.txtPrefix.config(state=NORMAL)
+        self.chkPaConfirm.config(state=NORMAL)
+        self.chkTokenExpiry.config(state=NORMAL)
+        self.root.update()
 
     def main(self):
         self.root.mainloop()

@@ -23,17 +23,21 @@ def startProcess():
     if not gui.entriesHaveValues():
         ## error
         gui.setStatus("Please check values for prefix, token and CSV...")
+        gui.setReadyState()
         return
 
     if not gui.isChecklistReady():
         gui.setStatus("Please make sure checklist is completed...")
+        gui.setReadyState()
         return
 
     pattern = re.compile("^.+[.]csv$", re.IGNORECASE)
-    if pattern.match(gui.csvFilePath) is None:
-        gui.setStatus("Please make sure the selected file is .csv file...")
-        return
 
+    for file in gui.csvList:
+        if pattern.match(file) is None:
+            gui.setStatus("Please make sure the selected files are .csv file...")
+            gui.setReadyState()
+            return
 
     global api
     api = VendApi(gui.txtPrefix.get(), gui.txtToken.get())
@@ -48,6 +52,7 @@ def processCustomers(api):
 
     if customers is None or len(customers) == 0:
         gui.setStatus("Please double check that prefix/token are correct...")
+        gui.setReadyState()
         return
 
     gui.setStatus("Retreived {0} customers...".format(len(customers)))
@@ -55,11 +60,15 @@ def processCustomers(api):
     gui.setStatus("Matching IDs to provided customer code...")
     codeToId = getCustCodeToId(customers)
 
-    custCodeToDelete = getColumn(gui.csvFilePath, 'customer_code')
+    custCodeToDelete = []
+    for file in gui.csvList:
+        filepath = gui.csvFileDict[file]
+        custCodeToDelete.extend(getColumn(filepath, 'customer_code'))
 
     numCustToDelete = len(custCodeToDelete)
     if  numCustToDelete == 0:
         gui.setStatus("Please make sure the provided CSV has customer_code column...")
+        gui.setReadyState()
         return
 
     gui.setStatus("Found {0} customers to delete...".format(numCustToDelete))
@@ -86,13 +95,14 @@ def setResultMessage(result, resultCsv):
     msg = "{0} customers were successfully deleted.\n".format(successfulDeletes)
 
     if failedCsv:
-        msg += "{0} could not be deleted. Exported list to {1}\n".format(len(result[500]), failedCsv)
+        msg += "{0} could not be deleted. \nExported list to {1}\n".format(len(result[500]), failedCsv)
 
     if openSalesCsv:
         msg += "Exported open sales linked to customers to {0}".format(openSalesCsv)
 
     gui.setResult(msg)
-    print(msg)
+    gui.btnReset.config(state=NORMAL)
+    #print(msg)
 
     #reset gui, status etc.
 
@@ -139,7 +149,7 @@ def writeCustomersToCSV(custList):
     return writeListToCSV(custList, "customer_code", "failed_customers")
 
 def writeOpenSalesToCsv(salesList):
-    return writeListToCSV(salesList, "invoice_number", "open_sales_to_delete")
+    return writeListToCSV(salesList, "invoice_number", "open_sales")
 
 def writeListToCSV(list, colHeader, title):
     #generic list to csv function
