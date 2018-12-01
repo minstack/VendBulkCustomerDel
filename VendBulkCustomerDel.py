@@ -116,9 +116,9 @@ def processCustomers(api):
     status_codes = [204,500,404]
 
     for r in results:
-        result[status_code[0]].extend(r[status_codes[0]])
-        result[status_code[1]].extend(r[status_codes[1]])
-        result[status_code[2]].extend(r[status_codes[2]])
+        result[status_codes[0]].extend(r[status_codes[0]])
+        result[status_codes[1]].extend(r[status_codes[1]])
+        result[status_codes[2]].extend(r[status_codes[2]])
 
     #result = outQueue.get()
     #temp = outQueue.get()
