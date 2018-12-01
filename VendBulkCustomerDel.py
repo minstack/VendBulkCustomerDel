@@ -99,7 +99,7 @@ def setResultMessage(result, resultCsv):
         msg += "{0} could not be deleted. \nSaved {1} to desktop.\n".format(len(result[500]), failedCsv)
 
     if openSalesCsv:
-        msg += "Saved {0} to desktop".format(openSalesCsv)
+        msg += "Saved {0} to desktop.".format(openSalesCsv)
 
     gui.setResult(msg)
     gui.btnReset.config(state=NORMAL)
