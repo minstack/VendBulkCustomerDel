@@ -18,6 +18,13 @@ class VendBulkCustomerDelGUI:
         mainFrame = Frame(self.root)
         mainFrame.pack(padx=20, pady=10)
 
+        self.__loadUserInputs__(mainFrame)
+        self.__loadButtons__(mainFrame)
+        self.__loadCsvControl__(mainFrame)
+        self.__loadCheckListControl__(mainFrame)
+        self.__loadMessageControls__(mainFrame)
+
+    def __loadUserInputs__(self, mainFrame):
         lblStorePrefix = Label(mainFrame, text="Store Prefix:", font="Helvetica 14 bold")
         lblStorePrefix.grid(row=1, column=0, sticky=E)
 
@@ -25,7 +32,7 @@ class VendBulkCustomerDelGUI:
         lblToken.grid(row=2, column=0, sticky=E)
 
         lblCsv = Label(mainFrame, text="CSV File:", font="Helvetica 14 bold")
-        lblCsv.grid(row=3, column=0, sticky=E)
+        #lblCsv.grid(row=3, column=0, sticky=E)
 
         #textboxes
         self.txtPrefix = Entry(mainFrame)
@@ -35,15 +42,12 @@ class VendBulkCustomerDelGUI:
 
         csvframe = Frame(mainFrame)
         self.txtCsv = Entry(csvframe)
-        self.btnOpenCsvDialog = Button(csvframe, text="...", font="Helvetica 14 bold", command=self.openFile)
-        self.txtCsv.pack(side=LEFT)
-        self.btnOpenCsvDialog.pack()
-        csvframe.grid(row=3,column=1, sticky=W)
 
-        self.statusMsg = StringVar()
-        self.lblStatus = Label(self.root, textvariable=self.statusMsg, bd=1, relief=SUNKEN, anchor=W, bg="#41B04B", fg="white", font="Helvetica 14 italic")
-        self.lblStatus.pack(side=BOTTOM, fill=X)
+        #self.txtCsv.pack(side=LEFT)
+        #self.btnOpenCsvDialog.pack()
+        #csvframe.grid(row=3,column=1, sticky=W)
 
+    def __loadButtons__(self, mainFrame):
         btnframe = Frame(mainFrame)
         self.btnDelCust = Button(btnframe, text="Delete Customers", command=self.startThread)
         self.btnDelCust.pack(side=RIGHT)
@@ -51,12 +55,25 @@ class VendBulkCustomerDelGUI:
         self.btnReset.pack()
         btnframe.grid(row=4, column=1)
 
+    def __loadCsvControl__(self, mainFrame):
         self.csvList = []
-        csvListbox = Listbox(mainFrame, listvariable=self.csvList, width=20)
-        csvListbox.grid(row=1, column=2, rowspan=3)
+        self.csvFileDict = {}
+        self.csvListbox = Listbox(mainFrame, listvariable=self.csvList, width=18, bd=0.5)
+        csvHeader = Label(mainFrame, text="CSV Files", font="Helvetica 14 bold")
 
+        csvHeader.grid(row=0, column=2)
+        self.csvListbox.grid(row=1, column=2, rowspan=3)
+
+        csvFrame = Frame(mainFrame)
+        csvFrame.grid(row=4, column=2, sticky=E)
+        self.btnOpenCsvDialog = Button(csvFrame, text="+", font="Helvetica 14 bold", command=self.openFile)
+        self.btnOpenCsvDialog.pack(side=LEFT)
+        self.btnDeleteFile = Button(csvFrame, text="-", font="Helvetica 14 bold", command=self.openFile)
+        self.btnDeleteFile.pack()
+
+    def __loadCheckListControl__(self, mainFrame):
         checklistFrame = Frame(mainFrame, width=200, height=200, bd=1)
-        Label(checklistFrame, text="Checklist", font="Helvetica 15 bold").grid(row=0)
+        Label(mainFrame, text="Checklist", font="Helvetica 14 bold").grid(row=0, column=3)
         checklistFrame.grid(row=0, column=3, rowspan=3)
 
         self.paConfirmation = BooleanVar()
@@ -65,6 +82,11 @@ class VendBulkCustomerDelGUI:
         chkPaConfirm.grid(row=1, sticky=W)
         chkTokenExpiry = Checkbutton(checklistFrame, text="Token Expiry Set", variable=self.tokenExpiry)
         chkTokenExpiry.grid(row=2, sticky=W)
+
+    def __loadMessageControls__(self, mainFrame):
+        self.statusMsg = StringVar()
+        self.lblStatus = Label(self.root, textvariable=self.statusMsg, bd=1, relief=SUNKEN, anchor=W, bg="#41B04B", fg="white", font="Helvetica 14 italic")
+        self.lblStatus.pack(side=BOTTOM, fill=X)
 
         resultFrame = Frame(mainFrame)
         resultFrame.grid(row=5,column=0, columnspan=3, rowspan=4)
@@ -94,11 +116,21 @@ class VendBulkCustomerDelGUI:
         return self.tokenExpiry.get() and self.paConfirmation.get()
 
     def openFile(self):
-        self.txtCsv.delete(0,END)
-        filename = askopenfilename(parent=self.root)
-        self.txtCsv.insert(0, filename)
-        self.csvFilePath = filename
-        #print(filename)
+        #self.txtCsv.delete(0,END)
+        filepath = askopenfilename(parent=self.root)
+        tempArr = filepath.split("/")
+
+        filename = tempArr[len(tempArr)-1]
+
+        if self.csvFileDict.get(filename, None) is not None:
+            self.setStatus("{0} has been added already.".format(filename))
+            return
+
+        self.csvFileDict[filename] = filepath
+        self.csvList.append(filename)
+
+        self.csvListbox.insert(END, filename)
+
 
     def setStatus(self, msg):
         self.statusMsg.set(msg)
