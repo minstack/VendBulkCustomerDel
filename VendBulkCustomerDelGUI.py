@@ -58,7 +58,7 @@ class VendBulkCustomerDelGUI:
     def __loadCsvControl__(self, mainFrame):
         self.csvList = []
         self.csvFileDict = {}
-        self.csvListbox = Listbox(mainFrame, listvariable=self.csvList, width=25, bd=0.5)
+        self.csvListbox = Listbox(mainFrame, listvariable=self.csvList, width=25, bd=0.5, selectmode='single')
 
 
         #csvHeader.grid(row=0, column=2)
@@ -72,7 +72,7 @@ class VendBulkCustomerDelGUI:
         csvFrame.grid(row=4, column=2, sticky=E)
         self.btnOpenCsvDialog = Button(csvFrame, text="+", font="Helvetica 14 bold", command=self.openFile)
         self.btnOpenCsvDialog.pack(side=LEFT)
-        self.btnDeleteFile = Button(csvFrame, text="-", font="Helvetica 14 bold", command=self.openFile)
+        self.btnDeleteFile = Button(csvFrame, text="-", font="Helvetica 14 bold", command=self.deleteFileFromList)
         self.btnDeleteFile.pack()
 
     def __loadCheckListControl__(self, mainFrame):
@@ -111,6 +111,15 @@ class VendBulkCustomerDelGUI:
         self.csvFileDict = {}
         self.setResult("")
 
+    def deleteFileFromList(self):
+        selected = self.csvListbox.curselection()
+
+        if not selected:
+            return
+
+        self.csvListbox.delete(selected[0])
+        self.csvFileDict.pop(self.csvList[selected[0]], None)
+        del self.csvList[selected[0]]
 
     def entriesHaveValues(self):
         return (len(self.txtPrefix.get().strip()) > 0) and (len(self.txtToken.get().strip()) > 0) and (len(self.csvList) > 0)
