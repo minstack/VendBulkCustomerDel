@@ -5,6 +5,8 @@ from VendBulkCustomerDelGUI import *
 import re
 import datetime as dt
 from os.path import expanduser
+import threading
+import Queue
 
 gui = None
 api = None
@@ -74,12 +76,40 @@ def processCustomers(api):
 
     gui.setStatus("Found {0} customers to delete...".format(numCustToDelete))
 
-    result = deleteCustomers(custCodeToDelete, codeToId, numCustToDelete, api)
+    range = numCustToDelete//3
+    subArr1 = custCodeToDelete[:range]
+    subArr2 = custCodeToDelete[range:(range+range)]
+    subArr3 = custCodeToDelete[(range+range):]
+
+    outQueue = Queue.Queue()
+    subThread1 = threading.Thread(target=deleteCustomers, args=(subArr1,codeToId,numCustToDelete, api,outQueue,))
+    subThread2 = threading.Thread(target=deleteCustomers, args=(subArr2,codeToId,numCustToDelete, api,outQueue,))
+    subThread3 = threading.Thread(target=deleteCustomers, args=(subArr3,codeToId,numCustToDelete, api,outQueue,))
+    subThread1.start()
+    subThread2.start()
+    subThread3.start()
+    subThread1.join()
+    subThread2.join()
+    subThread3.join()
+
+    result = outQueue.get()
+    temp = outQueue.get()
+    temp2 = outQueue.get()
+
+    tempArr = [204,500,404]
+
+    for status in tempArr:
+        result[status].extend(temp[status])
+        result[status].extend(temp2[status])
+
+    #result = deleteCustomers(custCodeToDelete, codeToId, numCustToDelete, api)
+
+    gui.setStatus("Successfully deleted {0} customers...".format(len(result[204])))
+
     resultCsv = None
 
     if len(result[500]) > 0:
         resultCsv = processFailedCustomers(result[500], codeToId)
-
 
     setResultMessage(result, resultCsv)
 
@@ -172,7 +202,7 @@ def writeListToCSV(list, colHeader, title):
 
     return filename
 
-def deleteCustomers(custCodeToDelete, codeToId, totalCust, api):
+def deleteCustomers(custCodeToDelete, codeToId, totalCust, api, outQueue=None):
     #global resultDict
 
     resultDict = {
@@ -181,7 +211,8 @@ def deleteCustomers(custCodeToDelete, codeToId, totalCust, api):
         204: []
     }
 
-    i = 0
+    global deletedCust
+    deletedCust = 0
     #print(codeToId)
     for code in custCodeToDelete:
         codeToDel = codeToId.get(str(code), None)
@@ -191,12 +222,15 @@ def deleteCustomers(custCodeToDelete, codeToId, totalCust, api):
         response = api.deleteCustomer(codeToDel)
         #print(response)
         resultDict[response].append(code)
-        gui.setStatus("Deleting customer {0} out of {1}".format(i, totalCust))
+        gui.setStatus("Deleting customer {0} out of {1}".format(deletedCust, totalCust))
 
-        i = len(resultDict[204]) #only count successful deletes
+        if response == 204:
+            deletedCust += 1 #only count successful deletes
 
-    gui.setStatus("Successfully deleted {0} customers...".format(i))
-
+    #gui.setStatus("Successfully deleted {0} customers...".format())
+    if outQueue:
+        outQueue.put(resultDict)
+        return
     #print(resultDict)
     return resultDict
 
