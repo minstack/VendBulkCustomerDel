@@ -76,31 +76,56 @@ def processCustomers(api):
 
     gui.setStatus("Found {0} customers to delete...".format(numCustToDelete))
 
-    range = numCustToDelete//3
-    subArr1 = custCodeToDelete[:range]
-    subArr2 = custCodeToDelete[range:(range+range)]
-    subArr3 = custCodeToDelete[(range+range):]
+    #probably a better way for this but straight forward without much thinking
+    range = numCustToDelete//4
+    subArrs = []
+    subArrs.append(custCodeToDelete[:range])
+    subArrs.append(custCodeToDelete[range:(2*range)])
+    subArrs.append(custCodeToDelete[(2*range):(3*range)])
+    subArrs.append(custCodeToDelete[(3*range):])
 
     outQueue = Queue.Queue()
-    subThread1 = threading.Thread(target=deleteCustomers, args=(subArr1,codeToId,numCustToDelete, api,outQueue,))
-    subThread2 = threading.Thread(target=deleteCustomers, args=(subArr2,codeToId,numCustToDelete, api,outQueue,))
-    subThread3 = threading.Thread(target=deleteCustomers, args=(subArr3,codeToId,numCustToDelete, api,outQueue,))
-    subThread1.start()
-    subThread2.start()
-    subThread3.start()
-    subThread1.join()
-    subThread2.join()
-    subThread3.join()
+    threads = []
+    for subarr in subArrs:
+        tempThread = threading.Thread(target=deleteCustomers, args=(subarr,codeToId,numCustToDelete, api,outQueue,))
+        tempThread.start()
+        threads.append(tempThread)
+    #subThread1 = threading.Thread(target=deleteCustomers, args=(subArr1,codeToId,numCustToDelete, api,outQueue,))
+    #subThread2 = threading.Thread(target=deleteCustomers, args=(subArr2,codeToId,numCustToDelete, api,outQueue,))
+    #subThread3 = threading.Thread(target=deleteCustomers, args=(subArr3,codeToId,numCustToDelete, api,outQueue,))
+    #subThread1.start()
+    #subThread2.start()
+    #subThread3.start()
 
-    result = outQueue.get()
-    temp = outQueue.get()
-    temp2 = outQueue.get()
+    for thread in threads:
+        thread.join()
+    #subThread1.join()
+    #subThread2.join()
+    #subThread3.join()
 
-    tempArr = [204,500,404]
+    results = []
+    result ={
+        204: [],
+        500: [],
+        404: []
+    }
 
-    for status in tempArr:
-        result[status].extend(temp[status])
-        result[status].extend(temp2[status])
+    for thread in threads:
+        results.append(outQueue.get())
+
+    status_codes = [204,500,404]
+
+    for r in results:
+        result[status_code[0]].extend(r[status_codes[0]])
+        result[status_code[1]].extend(r[status_codes[1]])
+        result[status_code[2]].extend(r[status_codes[2]])
+
+    #result = outQueue.get()
+    #temp = outQueue.get()
+    #temp2 = outQueue.get()
+    #for status in tempArr:
+    #    result[status].extend(temp[status])
+    #    result[status].extend(temp2[status])
 
     #result = deleteCustomers(custCodeToDelete, codeToId, numCustToDelete, api)
 
