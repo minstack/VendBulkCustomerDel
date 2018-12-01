@@ -170,6 +170,8 @@ def writeListToCSV(list, colHeader, title):
     return filename
 
 def deleteCustomers(custCodeToDelete, codeToId, totalCust, api):
+    #global resultDict
+
     resultDict = {
         500: [],
         404: [],
