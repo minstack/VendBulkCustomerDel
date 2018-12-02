@@ -77,19 +77,25 @@ def processCustomers(api):
     gui.setStatus("Found {0} customers to delete...".format(numCustToDelete))
 
     #probably a better way for this but straight forward without much thinking
-    range = numCustToDelete//4
-    subArrs = []
-    subArrs.append(custCodeToDelete[:range])
-    subArrs.append(custCodeToDelete[range:(2*range)])
-    subArrs.append(custCodeToDelete[(2*range):(3*range)])
-    subArrs.append(custCodeToDelete[(3*range):])
+    #range = numCustToDelete//4
+    #subArrs = []
+    #subArrs.append(custCodeToDelete[:range])
+    #subArrs.append(custCodeToDelete[range:(2*range)])
+    #subArrs.append(custCodeToDelete[(2*range):(3*range)])
+    #subArrs.append(custCodeToDelete[(3*range):])
+
+    subArrs = getSubLists(custCodeToDelete, 8)
+
+    print(len(subArrs))
+    #time.sleep(60)
 
     outQueue = Queue.Queue()
     threads = []
     for subarr in subArrs:
         tempThread = threading.Thread(target=deleteCustomers, args=(subarr,codeToId,numCustToDelete, api,outQueue,))
-        tempThread.start()
         threads.append(tempThread)
+        tempThread.start()
+        
 
     for thread in threads:
         thread.join()
@@ -119,6 +125,21 @@ def processCustomers(api):
         resultCsv = processFailedCustomers(result[500], codeToId)
 
     setResultMessage(result, resultCsv)
+
+def getSubLists(arr, numSubs):
+    range = len(arr)//numSubs
+    subArrs = []
+
+    i = 0
+    while i < (numSubs-1):
+        start = i * range
+        end = (i+1) * range
+        subArrs.append(arr[start:end])
+        i += 1
+
+    subArrs.append(arr[(i*range):])
+
+    return subArrs
 
 def setResultMessage(result, resultCsv):
     failedCsv = None
