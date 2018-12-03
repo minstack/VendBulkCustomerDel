@@ -108,7 +108,7 @@ class VendBulkCustomerDelGUI:
             Loads the status/result message controls onto the given parent frame
         """
         self.statusMsg = StringVar()
-        self.lblStatus = Label(self.root, textvariable=self.statusMsg, bd=1, relief=SUNKEN, anchor=W, bg="#41B04B", fg="white", font="Helvetica 14 italic")
+        self.lblStatus = Label(self.root, textvariable=self.statusMsg, bd=1, relief=SUNKEN, anchor=W, bg="#3A4953", fg="white", font="Helvetica 14 italic")
         self.lblStatus.pack(side=BOTTOM, fill=X)
 
         resultFrame = Frame(mainFrame)
