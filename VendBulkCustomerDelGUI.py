@@ -5,6 +5,10 @@ from tkFileDialog import askopenfilename
 class VendBulkCustomerDelGUI:
 
     def __init__(self, deletefunc):
+        """
+            Constructor for the GUI. The delete function passed is the entry
+            function in the calling class/module to bind to the delete button.
+        """
         self.__deletefunc = deletefunc
         self.root = Tk()
         self.root.geometry("650x450")
@@ -25,6 +29,9 @@ class VendBulkCustomerDelGUI:
         self.__loadMessageControls__(mainFrame)
 
     def __loadUserInputs__(self, mainFrame):
+        """
+            Loads the user input controls onto the given parent frame
+        """
         lblStorePrefix = Label(mainFrame, text="Store Prefix:", font="Helvetica 14 bold")
         lblStorePrefix.grid(row=1, column=0, sticky=E)
 
@@ -48,6 +55,9 @@ class VendBulkCustomerDelGUI:
         #csvframe.grid(row=3,column=1, sticky=W)
 
     def __loadButtons__(self, mainFrame):
+        """
+            Loads the button controls onto the given parent frame
+        """
         btnframe = Frame(mainFrame)
         self.btnDelCust = Button(btnframe, text="Delete Customers", command=self.startThread)
         self.btnDelCust.pack(side=RIGHT)
@@ -56,6 +66,9 @@ class VendBulkCustomerDelGUI:
         btnframe.grid(row=4, column=1)
 
     def __loadCsvControl__(self, mainFrame):
+        """
+            Loads the CSV file controls onto the given parent frame
+        """
         self.csvList = []
         self.csvFileDict = {}
         self.csvListbox = Listbox(mainFrame, listvariable=self.csvList, width=25, bd=0.5, selectmode='single')
@@ -76,6 +89,9 @@ class VendBulkCustomerDelGUI:
         self.btnDeleteFile.pack()
 
     def __loadCheckListControl__(self, mainFrame):
+        """
+            Loads the check list controls onto the given parent frame
+        """
         checklistFrame = Frame(mainFrame, width=200, height=200, bd=1)
         #Label(mainFrame, text="Checklist", font="Helvetica 14 bold").grid(row=0, column=3)
         checklistFrame.grid(row=3, column=1)
@@ -88,6 +104,9 @@ class VendBulkCustomerDelGUI:
         self.chkTokenExpiry.grid(row=2, sticky=W)
 
     def __loadMessageControls__(self, mainFrame):
+        """
+            Loads the status/result message controls onto the given parent frame
+        """
         self.statusMsg = StringVar()
         self.lblStatus = Label(self.root, textvariable=self.statusMsg, bd=1, relief=SUNKEN, anchor=W, bg="#41B04B", fg="white", font="Helvetica 14 italic")
         self.lblStatus.pack(side=BOTTOM, fill=X)
@@ -100,6 +119,9 @@ class VendBulkCustomerDelGUI:
         resultLabel.pack(pady=15)
 
     def reset(self):
+        """
+            Function to reset the state of the GUI.
+        """
         self.setStatus("")
         self.setReadyState()
         self.txtToken.delete(0,END)
@@ -112,6 +134,10 @@ class VendBulkCustomerDelGUI:
         self.setResult("")
 
     def deleteFileFromList(self):
+        """
+            Function to delete the selected file from the CSV listbox as well
+            as the corresponding list variable and dictionary.
+        """
         selected = self.csvListbox.curselection()
 
         if not selected:
@@ -122,9 +148,17 @@ class VendBulkCustomerDelGUI:
         del self.csvList[selected[0]]
 
     def entriesHaveValues(self):
+        """
+            Returns true/false whether the required input values have been
+            provided
+        """
         return (len(self.txtPrefix.get().strip()) > 0) and (len(self.txtToken.get().strip()) > 0) and (len(self.csvList) > 0)
 
     def startThread(self):
+        """
+            Main function to start the thread to the provided function of the
+            controller that creates/calls this class.
+        """
         self.setStatus("")
         self.setDeletingState()
         thr = threading.Thread(target=self.__deletefunc, args=(), kwargs={})
@@ -133,10 +167,14 @@ class VendBulkCustomerDelGUI:
         #self.setReadyState()
 
     def isChecklistReady(self):
+        """ Returns whether the checklist is completed. """
         return self.tokenExpiry.get() and self.paConfirmation.get()
 
     def openFile(self):
-        #self.txtCsv.delete(0,END)
+        """
+            When the + button is clicked to add CSV files, opens the file opener
+            dialog to retrieve the file.
+        """
         filepath = askopenfilename(parent=self.root)
         tempArr = filepath.split("/")
 
@@ -153,12 +191,15 @@ class VendBulkCustomerDelGUI:
 
 
     def setStatus(self, msg):
+        """ Sets the status message to the provided string. """
         self.statusMsg.set(msg)
 
     def setResult(self, msg):
+        """ Sets the result variable to the given string. """
         self.resultText.set(msg)
 
     def setDeletingState(self):
+        """ Sets all the controls to disabled state to prevent any multi-clicks"""
         self.btnReset.config(state=DISABLED)
         self.btnDelCust.config(state=DISABLED)
         self.btnOpenCsvDialog.config(state=DISABLED)
@@ -170,6 +211,7 @@ class VendBulkCustomerDelGUI:
         self.root.update()
 
     def setReadyState(self):
+        """ Resets all controls back to normal state."""
         self.btnReset.config(state=NORMAL)
         self.btnDelCust.config(state=NORMAL)
         self.btnOpenCsvDialog.config(state=NORMAL)
@@ -181,4 +223,5 @@ class VendBulkCustomerDelGUI:
         self.root.update()
 
     def main(self):
+        """ Main loop for this GUI. """
         self.root.mainloop()

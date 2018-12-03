@@ -12,6 +12,10 @@ gui = None
 api = None
 
 def getColumn(csvFile, colName):
+    """
+        Processes the provided CSV and retrieves and returns the column values
+        of the specified column name. Taken from stack overflow.
+    """
     columns = defaultdict(list) # each value in each column is appended to a list
 
     with open(csvFile) as f:
@@ -23,6 +27,11 @@ def getColumn(csvFile, colName):
     return columns[colName]
 
 def startProcess():
+    """
+        The entry point to begin retrieving customers to delete and process the
+        bulk delete task. Handles all the basic error checks and feedback to the
+        user through the GUI status message/bar, before creating API class.
+    """
     if not gui.entriesHaveValues():
         ## error
         gui.setStatus("Please check values for prefix, token and CSV...")
@@ -43,13 +52,21 @@ def startProcess():
             return
 
     global api
-    api = VendApi(gui.txtPrefix.get(), gui.txtToken.get())
+    api = VendApi(gui.txtPrefix.get().strip(), gui.txtToken.get().strip())
 
     processCustomers(api)
 
     #print(api.getCustomers())
 
 def processCustomers(api):
+    """
+        Main function to begin the bulk delete process. Retrieves all the
+        customers of the provided store, matches the code to ID of customers,
+        splits the main array into subarrays to start 8 threads for the bulk
+        delete task.
+        Waits for all the threads to complete and uses a main queue to retrieve
+        the results of the deletes and processes the results.
+    """
     gui.setStatus("Retreiving customers...")
     customers = api.getCustomers()
 
@@ -76,17 +93,9 @@ def processCustomers(api):
 
     gui.setStatus("Found {0} customers to delete...".format(numCustToDelete))
 
-    #probably a better way for this but straight forward without much thinking
-    #range = numCustToDelete//4
-    #subArrs = []
-    #subArrs.append(custCodeToDelete[:range])
-    #subArrs.append(custCodeToDelete[range:(2*range)])
-    #subArrs.append(custCodeToDelete[(2*range):(3*range)])
-    #subArrs.append(custCodeToDelete[(3*range):])
-
     subArrs = getSubLists(custCodeToDelete, 8)
 
-    print(len(subArrs))
+    #print(len(subArrs))
     #time.sleep(60)
 
     outQueue = Queue.Queue()
@@ -95,7 +104,7 @@ def processCustomers(api):
         tempThread = threading.Thread(target=deleteCustomers, args=(subarr,codeToId,numCustToDelete, api,outQueue,))
         threads.append(tempThread)
         tempThread.start()
-        
+
 
     for thread in threads:
         thread.join()
@@ -127,6 +136,10 @@ def processCustomers(api):
     setResultMessage(result, resultCsv)
 
 def getSubLists(arr, numSubs):
+    """
+        Helper to return array of subarrays of the provided array and number of
+        sublist to create
+    """
     range = len(arr)//numSubs
     subArrs = []
 
@@ -142,6 +155,11 @@ def getSubLists(arr, numSubs):
     return subArrs
 
 def setResultMessage(result, resultCsv):
+    """
+        Final function called to set the results to the GUI and inform the user
+        of the results; Displays the successful/unsuccessful delete count and
+        the corresponding CSV files if there are unsucessful deletes.
+    """
     failedCsv = None
     openSalesCsv = None
 
@@ -166,6 +184,11 @@ def setResultMessage(result, resultCsv):
     #reset gui, status etc.
 
 def processFailedCustomers(failedCustomers, codeToId):
+    """
+        Retrieves the open sales (layby, on-account) of the customers provided
+        and exports them into corresponding CSV files.  Returns the CSV filesnames
+        of unsucessful customers and their open sales.
+    """
     filenames = {}
 
     filenames['failedcust'] = writeCustomersToCSV(failedCustomers)
@@ -184,7 +207,12 @@ def processFailedCustomers(failedCustomers, codeToId):
     return filenames
 
 def getOpenSaleMatch(custList, codeToId, salesList):
-
+    """
+        Returns array of open sales invoice numbers of the provided customer list.
+        The provided customer list is assumed to be customer codes and will
+        do a reverse lookup of code to ID.  The provided sales list is all the
+        open sales of the store this task is being run for.
+    """
     tempReverse = {}
     # id to code to linearly check if sale is attached to customer
     # trying to be deleted
@@ -205,13 +233,19 @@ def getOpenSaleMatch(custList, codeToId, salesList):
 
 
 def writeCustomersToCSV(custList):
+    """ Returns the exported CSV filename of the provided customers """
     return writeListToCSV(custList, "customer_code", "failed_customers")
 
 def writeOpenSalesToCsv(salesList):
+    """ Returns the exported CSV filename of the provided sales """
     return writeListToCSV(salesList, "invoice_number", "open_sales")
 
 def writeListToCSV(list, colHeader, title):
-    #generic list to csv function
+    """
+        Exports the provided array into a column with the provided column header
+        as a CSV file with specified title as suffix to filename.
+        Filename format: [prefix][datetime][title].csv
+    """
     if colHeader:
         list.insert(0, colHeader)
 
@@ -231,7 +265,11 @@ def writeListToCSV(list, colHeader, title):
     return filename
 
 def deleteCustomers(custCodeToDelete, codeToId, totalCust, api, outQueue=None):
-    #global resultDict
+    """
+        Main function to delete the provided customers through API calls.
+        If outQueue is provided, will use this to store the result; used for
+        threads for faster processing.
+    """
 
     resultDict = {
         500: [],
@@ -263,6 +301,10 @@ def deleteCustomers(custCodeToDelete, codeToId, totalCust, api, outQueue=None):
     return resultDict
 
 def getCustCodeToId(customers):
+    """
+        Returns customer code to ID dictionary based on the provided customer
+        objects. Must include at least 'customer_code' and 'id' key.
+    """
     codeToId = {}
 
     for cust in customers:
