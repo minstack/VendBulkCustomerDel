@@ -52,9 +52,13 @@ def startProcess():
             return
 
     global api
-    api = VendApi(gui.txtPrefix.get().strip(), gui.txtToken.get().strip())
+    try:
+        api = VendApi(gui.txtPrefix.get().strip(), gui.txtToken.get().strip())
 
-    processCustomers(api)
+        processCustomers(api)
+    except:
+        gui.setStatus("Something went terribly wrong. Please contact support.")
+
 
     #print(api.getCustomers())
 
