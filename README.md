@@ -2,7 +2,7 @@
 
 To make bulk customer deletes more efficient without the need for the use of (multiple) CSVs, VLOOKUPs and text formatting to manually copy paste to backend.
 
-This will delete the provided customers provided that they are not attached to any open (layby or on-account sales).  If they cannot be deleted because of the previous reason, those customers will be exported into a list (customer_code only) as well as all the open sales (invoice #). These exports will be separate files.
+This will delete the provided customers only if they are not attached to any open (layby or on-account sales).  If they cannot be deleted because of the previous reason, those customers will be exported into a list (customer_code only) as well as all the open sales (invoice #). These exports will be separate files.
 
 Currently, it has been tested and increased to include 8 threads (just much faster) but have not been tested on a large amount of customers to delete. This must be monitored to see if that may be too many threads to run. If that is the case, I will update with possibly 4-6 threads in total, for stability.
 
