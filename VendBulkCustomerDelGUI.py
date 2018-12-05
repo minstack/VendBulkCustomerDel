@@ -12,7 +12,7 @@ class VendBulkCustomerDelGUI:
         self.__deletefunc = deletefunc
         self.root = Tk()
         self.root.call('tk','scaling', 2.0)
-        self.root.geometry("650x450")
+        #self.root.geometry("650x450")
         self.root.minsize(650,450)
         #self.root.resizable(0,0)
         self.root.title("Vend Bulk Customer Delete")
