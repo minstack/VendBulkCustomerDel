@@ -9,6 +9,7 @@ class VendBulkCustomerDelGUI:
             Constructor for the GUI. The delete function passed is the entry
             function in the calling class/module to bind to the delete button.
         """
+
         self.__deletefunc = deletefunc
         self.root = Tk()
         self.root.call('tk','scaling', 2.0)
