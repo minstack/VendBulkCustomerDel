@@ -53,12 +53,12 @@ def startProcess():
             return
 
     global api
-    #try:
-    api = VendApi(gui.txtPrefix.get().strip(), gui.txtToken.get().strip())
+    try:
+        api = VendApi(gui.txtPrefix.get().strip(), gui.txtToken.get().strip())
 
-    processCustomers(api)
-    #except:
-    #    gui.setStatus("Something went terribly wrong. Please contact support.")
+        processCustomers(api)
+    except:
+        gui.setStatus("Something went terribly wrong. Please contact support.")
     #    traceback.print_exc()
 
 
@@ -318,11 +318,9 @@ def getCustCodeToId(customers):
         codeToId[str(cust['customer_code']).lstrip("0")] = cust['id']
 
     return codeToId
-def displayBugMessage(title, msg):
-    tkinter.messagebox.showinfo(title, msg)
 
 if __name__ == "__main__":
 
     gui = VendBulkCustomerDelGUI(startProcess)
-    threading.Thread(target=displayBugMessage, args=["Mojave Bug", "Please resize your window to re-render the button text."]).start()
+
     gui.main()
