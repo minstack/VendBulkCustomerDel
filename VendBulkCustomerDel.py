@@ -6,8 +6,8 @@ import re
 import datetime as dt
 from os.path import expanduser
 import threading
-import Queue
-import tkMessageBox
+import queue
+import tkinter
 
 gui = None
 api = None
@@ -69,7 +69,7 @@ def processCustomers(api):
         customers of the provided store, matches the code to ID of customers,
         splits the main array into subarrays to start 8 threads for the bulk
         delete task.
-        Waits for all the threads to complete and uses a main queue to retrieve
+        Waits for all the threads to complete and uses a main ue to retrieve
         the results of the deletes and processes the results.
     """
     gui.setStatus("Retreiving customers...")
@@ -103,7 +103,7 @@ def processCustomers(api):
     #print(len(subArrs))
     #time.sleep(60)
 
-    outQueue = Queue.Queue()
+    outQueue = queue.Queue()
     threads = []
     for subarr in subArrs:
         tempThread = threading.Thread(target=deleteCustomers, args=(subarr,codeToId,numCustToDelete, api,outQueue,))
@@ -318,7 +318,7 @@ def getCustCodeToId(customers):
 
     return codeToId
 def displayBugMessage(title, msg):
-    tkMessageBox.showinfo(title, msg)
+    tkinter.messagebox.showinfo(title, msg)
 
 if __name__ == "__main__":
 

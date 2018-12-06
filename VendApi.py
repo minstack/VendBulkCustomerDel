@@ -17,7 +17,7 @@ class VendApi:
     }
 
     __domain = ''
-    __headers = {"Authorization" : "", "User-Agent" : "Python 2.7/Vend-Support-Tool"}
+    __headers = {"Authorization" : "", "User-Agent" : "Python 3.7/Vend-Support-Tool"}
     __prefix = ''
 
     def __init__(self, prefix, token):

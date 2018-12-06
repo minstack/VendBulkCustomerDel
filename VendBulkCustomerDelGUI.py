@@ -1,6 +1,7 @@
-from Tkinter import *
+from tkinter import *
 import threading
-from tkFileDialog import askopenfilename
+from tkinter.filedialog import askopenfilename
+#from tkFileDialog import askopenfilename
 
 class VendBulkCustomerDelGUI:
 
@@ -12,6 +13,7 @@ class VendBulkCustomerDelGUI:
 
         self.__deletefunc = deletefunc
         self.root = Tk()
+        self.root.geometry("700x500")
         self.root.call('tk','scaling', 2.0)
         #self.root.geometry("650x450")
         self.root.minsize(650,450)
@@ -30,6 +32,9 @@ class VendBulkCustomerDelGUI:
         self.__loadCsvControl__(mainFrame)
         self.__loadCheckListControl__(mainFrame)
         self.__loadMessageControls__(mainFrame)
+
+
+        self.root.geometry("650x450")
 
     def __loadUserInputs__(self, mainFrame):
         """
@@ -63,10 +68,10 @@ class VendBulkCustomerDelGUI:
         """
         btnframe = Frame(mainFrame)
         self.btnDelCust = Button(btnframe, text="Delete Customers", command=self.startThread)
-        self.btnDelCust.pack(side=RIGHT)
+        self.btnDelCust.pack(side=RIGHT, padx=5)
         self.btnReset = Button(btnframe, text="Reset", command=self.reset)
         self.btnReset.pack()
-        btnframe.grid(row=4, column=1)
+        btnframe.grid(row=4, column=1, padx=5)
 
     def __loadCsvControl__(self, mainFrame):
         """
@@ -78,17 +83,17 @@ class VendBulkCustomerDelGUI:
 
 
         #csvHeader.grid(row=0, column=2)
-        self.csvListbox.grid(row=1, column=2, rowspan=3)
+        self.csvListbox.grid(row=1, column=2, rowspan=3, padx=10)
 
-        csvFrame = Frame(mainFrame)
+        csvFrame = Frame(mainFrame, padx=10)
 
         csvHeader = Label(csvFrame, text="CSV Files", font="Helvetica 14 bold")
         csvHeader.pack(side=LEFT)
 
         csvFrame.grid(row=4, column=2, sticky=E)
-        self.btnOpenCsvDialog = Button(csvFrame, text="+", font="Helvetica 14 bold", command=self.openFile)
+        self.btnOpenCsvDialog = Button(csvFrame, text="+", font="Helvetica 14 bold", command=self.openFile, width=3)
         self.btnOpenCsvDialog.pack(side=LEFT)
-        self.btnDeleteFile = Button(csvFrame, text="-", font="Helvetica 14 bold", command=self.deleteFileFromList)
+        self.btnDeleteFile = Button(csvFrame, text="-", font="Helvetica 14 bold", command=self.deleteFileFromList, width=3)
         self.btnDeleteFile.pack()
 
     def __loadCheckListControl__(self, mainFrame):
