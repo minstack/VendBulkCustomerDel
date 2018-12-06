@@ -147,13 +147,11 @@ class VendBulkCustomerDelGUI:
             as the corresponding list variable and dictionary.
         """
         selected = self.csvListbox.curselection()
-
-        if not selected:
-            return
-
-        self.csvListbox.delete(selected[0])
-        self.csvFileDict.pop(self.csvList[selected[0]], None)
-        del self.csvList[selected[0]]
+    
+        if selected:
+            self.csvListbox.delete(selected[0])
+            self.csvFileDict.pop(self.csvList[selected[0]], None)
+            del self.csvList[selected[0]]
 
     def entriesHaveValues(self):
         """
