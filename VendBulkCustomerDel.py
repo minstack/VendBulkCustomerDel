@@ -53,12 +53,13 @@ def startProcess():
             return
 
     global api
-    try:
-        api = VendApi(gui.txtPrefix.get().strip(), gui.txtToken.get().strip())
+    #try:
+    api = VendApi(gui.txtPrefix.get().strip(), gui.txtToken.get().strip())
 
-        processCustomers(api)
-    except:
-        gui.setStatus("Something went terribly wrong. Please contact support.")
+    processCustomers(api)
+    #except:
+    #    gui.setStatus("Something went terribly wrong. Please contact support.")
+    #    traceback.print_exc()
 
 
     #print(api.getCustomers())
@@ -260,8 +261,8 @@ def writeListToCSV(list, colHeader, title):
 
     desktop = expanduser("~") + '/' + 'Desktop/'
 
-    with open(desktop + filename, "wb") as file:
-        writer = csv.writer(file, quoting=csv.QUOTE_ALL)
+    with open(desktop + filename, "w", newline='', encoding='utf-8') as file:
+        writer = csv.writer(file, delimiter=',', quotechar='"',quoting=csv.QUOTE_ALL)
         for row in list:
             writer.writerow([row])
 
