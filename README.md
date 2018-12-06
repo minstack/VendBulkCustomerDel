@@ -8,7 +8,7 @@ Currently, it has been tested and increased to include 8 threads (just much fast
 
 
 # Platform
-Currently macOS only, however, the Windows binary can be compiled easily if needed.
+Currently macOS only~, however, the Windows binary can be compiled easily if needed.~
 
 
 # Setup
