@@ -70,7 +70,7 @@ def processCustomers(api):
         customers of the provided store, matches the code to ID of customers,
         splits the main array into subarrays to start 8 threads for the bulk
         delete task.
-        Waits for all the threads to complete and uses a main ue to retrieve
+        Waits for all the threads to complete and uses a main queue to retrieve
         the results of the deletes and processes the results.
     """
     gui.setStatus("Retreiving customers...")
