@@ -1,3 +1,5 @@
+_**This was a standalone tool that hasn't been updated. Please see VendGUITool which includes this (updated/supported) function**_
+https://github.com/minstack/VendGUITool
 # VendBulkCustomerDel
 
 To make bulk customer deletes more efficient without the need for the use of (multiple) CSVs, VLOOKUPs and text formatting to manually copy paste to backend.
